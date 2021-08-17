@@ -7,17 +7,17 @@ const axios = require('axios').default;
 
 function makeRequest() {
   const span = tracer.startSpan('client.makeRequest()', {
-    parent: tracer.getCurrentSpan(),
     kind: api.SpanKind.CLIENT,
   });
 
-  tracer.withSpan(span, async () => {
+  api.context.with(api.trace.setSpan(api.ROOT_CONTEXT, span), async () => {
     try {
       const res = await axios.get('http://localhost:8080/run_test');
-      span.setStatus({ code: api.CanonicalCode.OK });
-      console.log(res.statusText);
+      console.log('status:', res.statusText);
+      span.setStatus({ code: api.SpanStatusCode.OK });
     } catch (e) {
-      span.setStatus({ code: api.CanonicalCode.UNKNOWN, message: e.message });
+      console.log('failed:', e.message);
+      span.setStatus({ code: api.SpanStatusCode.ERROR, message: e.message });
     }
     span.end();
     console.log('Sleeping 5 seconds before shutdown to ensure all records are flushed.');

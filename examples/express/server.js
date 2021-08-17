@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line
-const tracer = require('./tracer')('example-express-server');
+require('./tracer')('example-express-server');
 
 // Require in rest of modules
 const express = require('express');
@@ -10,7 +10,6 @@ const axios = require('axios').default;
 // Setup express
 const app = express();
 const PORT = 8080;
-
 
 const getCrudController = () => {
   const router = express.Router();
@@ -32,27 +31,24 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-async function setupRoutes() {
-  app.use(express.json());
-
-  app.get('/run_test', async (req, res) => {
-    const createdCat = await axios.post(`http://localhost:${PORT}/cats`, {
-      name: 'Tom',
-      friends: [
-        'Jerry',
-      ],
-    }, {
-      headers: {
-        Authorization: 'secret_token',
-      },
-    });
-
-    return res.status(201).send(createdCat.data);
+app.use(express.json());
+app.get('/run_test', async (req, res) => {
+  // Calls another endpoint of the same API, somewhat mimicing an external API call
+  const createdCat = await axios.post(`http://localhost:${PORT}/cats`, {
+    name: 'Tom',
+    friends: [
+      'Jerry',
+    ],
+  }, {
+    headers: {
+      Authorization: 'secret_token',
+    },
   });
-  app.use('/cats', authMiddleware, getCrudController());
-}
 
-setupRoutes().then(() => {
-  app.listen(PORT);
+  return res.status(201).send(createdCat.data);
+});
+app.use('/cats', authMiddleware, getCrudController());
+
+app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
 });

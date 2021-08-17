@@ -1,5 +1,6 @@
 'use strict';
 
+const api = require('@opentelemetry/api');
 const tracer = require('./tracer')('example-dns');
 // eslint-disable-next-line import/order
 const dns = require('dns').promises;
@@ -10,7 +11,7 @@ function makeLookup() {
   // the span, which is created to track work that happens outside of the
   // dns lookup query.
   const span = tracer.startSpan('dnsLookup');
-  tracer.withSpan(span, async () => {
+  api.context.with(api.trace.setSpan(api.ROOT_CONTEXT, span), async () => {
     try {
       await dns.lookup('montreal.ca');
     } catch (error) {
@@ -19,7 +20,7 @@ function makeLookup() {
         'error.message': error.message,
       });
     } finally {
-      console.log(`traceid: ${span.context().traceId}`);
+      console.log(`traceid: ${span.spanContext().traceId}`);
       span.end();
     }
   });

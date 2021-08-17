@@ -1,19 +1,21 @@
 'use strict';
 
+const api = require('@opentelemetry/api');
 // eslint-disable-next-line import/order
-const tracer = require('./tracer')('example-mongodb-http-server');
-const MongoClient = require('mongodb').MongoClient;
+require('./tracer')('example-mongodb-http-server');
+
+const { MongoClient } = require('mongodb');
 const http = require('http');
-const url = "mongodb://localhost:27017/mydb";
+
+const url = 'mongodb://localhost:27017/mydb';
 let db;
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer(port) {
-
   // Connect to db
-  MongoClient.connect(url, function(err, database) {
-    if(err) throw err;
-    db = database.db("mydb");
+  MongoClient.connect(url, (err, database) => {
+    if (err) throw err;
+    db = database.db('mydb');
   });
   // Creates a server
   const server = http.createServer(handleRequest);
@@ -28,10 +30,9 @@ function startServer(port) {
 
 /** A function which handles requests and send response. */
 function handleRequest(request, response) {
-
-  const currentSpan = tracer.getCurrentSpan();
+  const currentSpan = api.trace.getSpan(api.context.active());
   // display traceid in the terminal
-  const { traceId } = currentSpan.context();
+  const { traceId } = currentSpan.spanContext();
   console.log(`traceid: ${traceId}`);
   console.log(`Jaeger URL: http://localhost:16686/trace/${traceId}`);
   console.log(`Zipkin URL: http://localhost:9411/zipkin/traces/${traceId}`);
@@ -43,7 +44,7 @@ function handleRequest(request, response) {
       if (request.url === '/collection/') {
         handleCreateCollection(response);
       } else if (request.url === '/insert/') {
-         handleInsertQuery(response);
+        handleInsertQuery(response);
       } else if (request.url === '/get/') {
         handleGetQuery(response);
       } else {
@@ -58,39 +59,41 @@ function handleRequest(request, response) {
 startServer(8080);
 
 function handleInsertQuery(response) {
-  const obj = { name: "John", age: "20" };
-    db.collection("users").insertOne(obj, function(err, res) {
+  const obj = { name: 'John', age: '20' };
+  const collection = db.collection('users');
+  collection.insertOne(obj, (err) => {
     if (err) {
       console.log('Error code:', err.code);
       response.end(err.message);
     } else {
-      console.log("1 document inserted");
-      response.end();
+      console.log('1 document inserted');
+      // find document to test context propagation using callback
+      collection.findOne({}, function () {
+        response.end();
+      });
     }
   });
-
 }
 
 function handleGetQuery(response) {
-  db.collection("users").find({}, function(err, res) {
+  db.collection('users').find({}, (err) => {
     if (err) {
       console.log('Error code:', err.code);
       response.end(err.message);
     } else {
-      console.log("1 document served");
+      console.log('1 document served');
       response.end();
     }
   });
-
 }
 
 function handleCreateCollection(response) {
-  db.createCollection("users", function(err, res) {
+  db.createCollection('users', (err) => {
     if (err) {
       console.log('Error code:', err.code);
       response.end(err.message);
     } else {
-      console.log("1 collection created");
+      console.log('1 collection created');
       response.end();
     }
   });

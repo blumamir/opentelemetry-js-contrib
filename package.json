@@ -1,7 +1,14 @@
 {
   "name": "opentelemetry-contrib",
-  "version": "0.7.0",
+  "version": "0.24.0",
   "description": "This is a repository for OpenTelemetry JavaScript contributions.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-telemetry/opentelemetry-js-contrib.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
@@ -11,10 +18,12 @@
     "version:update": "lerna run version:update",
     "compile": "lerna run compile",
     "test": "lerna run test",
+    "test:ci:changed": "lerna run test --since origin/main --parallel",
     "test:browser": "lerna run test:browser",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --no-ci",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
+    "codecov:ci:changed": "lerna run codecov --since origin/main --parallel",
     "codecov:browser": "lerna run codecov:browser",
     "changelog": "lerna-changelog",
     "lint": "lerna run lint",
@@ -22,7 +31,6 @@
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix"
   },
-  "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
     "opentelemetry",
     "nodejs",
@@ -34,21 +42,37 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "^8.3.4",
-    "@commitlint/config-conventional": "^8.3.4",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.19.1",
-    "gts": "^1.1.0",
-    "husky": "^3.1.0",
-    "lerna": "^3.17.0",
-    "lerna-changelog": "^1.0.0",
-    "tslint": "^5.0.0",
-    "typescript": "^3.7.2"
+    "@commitlint/cli": "13.1.0",
+    "@commitlint/config-conventional": "13.1.0",
+    "@typescript-eslint/eslint-plugin": "4.29.0",
+    "@typescript-eslint/parser": "4.29.0",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb-base": "14.2.1",
+    "eslint-plugin-header": "3.1.1",
+    "eslint-plugin-import": "2.23.4",
+    "gts": "3.1.0",
+    "husky": "7.0.1",
+    "lerna": "3.22.1",
+    "lerna-changelog": "1.0.1",
+    "typescript": "4.3.5"
   },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "changelog": {
+    "labels": {
+      "breaking": ":boom: Breaking Change",
+      "bug": ":bug: Bug Fix",
+      "plugin-request": ":tada: New Plugins",
+      "enhancement": ":rocket: Enhancement",
+      "internal": ":house: Internal",
+      "documentation": ":memo: Documentation"
+    },
+    "ignoreCommitters": [
+      "renovate-bot",
+      "dependabot"
+    ]
   }
 }

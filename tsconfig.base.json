@@ -8,6 +8,7 @@
     "module": "commonjs",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "pretty": true,
@@ -15,7 +16,8 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "es2017",
-    "incremental": true
+    "incremental": true,
+    "newLine": "LF"
   },
   "exclude": [
     "node_modules"

@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "groupName": "all non-major dependencies",
+      "updateTypes": ["patch", "minor"],
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "matchPackageNames": ["@opentelemetry/api"],
+      "rangeStrategy": "bump"
+    }
+  ],
+  "assignees": [
+    "@dyladan",
+    "@mayurkale22",
+    "@obecny"
+  ],
+  "schedule": [
+    "before 3am on Friday"
+  ],
+  "labels": ["dependencies"]
+}

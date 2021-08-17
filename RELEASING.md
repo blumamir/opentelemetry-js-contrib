@@ -2,7 +2,31 @@
 
 This document explains how to publish all OT modules at version x.y.z. Ensure that you’re following semver when choosing a version number.
 
-Release Process:
+## Auto-generate a Release PR
+
+Navigate to the [Create a Release PR Worflow](https://github.com/open-telemetry/opentelemetry-js-contrib/actions/workflows/release-pr.yml). Click the "Run workflow" dropdown, enter the semver-compliant version to release, then click "Run workflow". It will generate a release pull request from a branch named like `release/x.y.z`.
+
+## Review Release PR
+
+If necessary, update sample code or documentation on the `release/x.y.z` branch to be included in the release. Another maintainer should approve the PR, specifically validating the automatic updates and verifying the tests are passing.
+
+NOTE: If any major changes are merged while the release PR is open, the CHANGELOG on the `release/x.y.z` branch must be manually updated to reflect the change.
+
+## Merge Release PR
+
+After approval, merge the release PR. This will automatically publish all packages. Verify:
+
+* The [publish workflow](https://github.com/open-telemetry/opentelemetry-js-contrib/actions/workflows/publish.yml) runs successfully
+* The new version is available in NPM, e.g. for the [Express instrumentation package](https://www.npmjs.com/package/@opentelemetry/instrumentation-express)
+* A [GitHub Release](https://github.com/open-telemetry/opentelemetry-js-contrib/releases) was cut correctly, with a tag pointing to the new version, and a body of the changelog
+
+That's it! No need to read on unless something above went wrong.
+
+# Manual Publishing Process
+
+If any step of the above automated process fails, complete the release manually by picking up at the failed step.
+
+Manual Release Process Steps:
 
 * [Update to latest locally](#update-to-latest-locally)
 * [Create a new branch](#create-a-new-branch)
@@ -16,7 +40,7 @@ Release Process:
 
 ## Update to latest locally
 
-Use `git fetch` and `git checkout origin/master` to ensure you’re on the latest commit. Make sure you have no unstaged changes. Ideally, also use `git clean -dfx` to remove all ignored and untracked files.
+Use `git fetch` and `git checkout origin/main` to ensure you’re on the latest commit. Make sure you have no unstaged changes. Ideally, also use `git clean -dfx` to remove all ignored and untracked files.
 
 ## Create a new branch
 
@@ -70,7 +94,7 @@ GITHUB_AUTH=xxxxx lerna-changelog --from=v1.0.0 --to=v2.0.0
 
 From what `lerna-changelog` has generated, starts new Unreleased label. Follow the example set by recent Released label.
 
-On [GitHub Releases](https://github.com/open-telemetry/opentelemetry-js/releases), follow the example set by recent releases to populate a summary of changes, as well as a list of commits that were applied since the last release. Save it as a draft, don’t publish it. Don’t forget the tag -- call it `vx.y.z` and leave it pointing at `master` for now (this can be changed as long as the GitHub release isn’t published).
+On [GitHub Releases](https://github.com/open-telemetry/opentelemetry-js/releases), follow the example set by recent releases to populate a summary of changes, as well as a list of commits that were applied since the last release. Save it as a draft, don’t publish it. Don’t forget the tag -- call it `vx.y.z` and leave it pointing at `main` for now (this can be changed as long as the GitHub release isn’t published).
 
 ## Create a new PR
 
@@ -101,9 +125,9 @@ Publish the GitHub release, ensuring that the tag points to the newly landed com
 
 ## Update CHANGELOG
 
-* After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
+* After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md) and start new Unreleased label.
 * Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
-* Go through PR review and merge it to GitHub master branch.
+* Go through PR review and merge it to GitHub main branch.
 
 
 ## Known Issues

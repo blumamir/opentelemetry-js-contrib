@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ const appRoot = process.cwd();
 const packageJsonUrl = path.resolve(`${appRoot}/package.json`);
 const pjson = require(packageJsonUrl);
 
-const content = `/*!
- * Copyright 2019, OpenTelemetry Authors
+const content = `/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,6 @@ const content = `/*!
 export const VERSION = '${pjson.version}';
 `;
 
-const fileUrl = path.join(appRoot, "src", "version.ts")
+const fileUrl = path.join(appRoot, 'src', 'version.ts')
 
-fs.writeFileSync(fileUrl, content.replace(/\n/g, os.EOL));
+fs.writeFileSync(fileUrl, content);
