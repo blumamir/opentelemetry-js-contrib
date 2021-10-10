@@ -13,6 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import {
+  Span,
+  SpanAttributes,
+  SpanStatusCode,
+  Tracer,
+} from '@opentelemetry/api';
+import type { FastifyReply } from 'fastify';
+
+const spanRequestSymbol = Symbol(
+  'opentelemetry.instrumentation.fastify.request_active_span'
+);
+export type PluginFastifyReply = FastifyReply & {
+  [spanRequestSymbol]?: Span;
+};
+
+export function startSpan(
+  reply: PluginFastifyReply,
+  tracer: Tracer,
+  spanName: string,
+  spanAttributes: SpanAttributes = {}
+) {
+  const span = tracer.startSpan(spanName, { attributes: spanAttributes });
+  Object.defineProperty(reply, spanRequestSymbol, {
+    enumerable: false,
+    configurable: true,
+    value: span,
+  });
+  return span;
+}
+
+export function endSpan(reply: PluginFastifyReply, err?: any) {
+  const span = reply[spanRequestSymbol];
+  // there is no active span, or it has already ended
+  if (!span) {
+    return;
+  }
+  if (err) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: err.message,
+    });
+    span.recordException(err);
+  }
+  span.end();
+  delete reply[spanRequestSymbol];
+}
 
 // @TODO after approve add this to instrumentation package and replace usage
 // when it will be released

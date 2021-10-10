@@ -30,7 +30,7 @@ import { FastifyRequest } from 'fastify/types/request';
 import * as http from 'http';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { ANONYMOUS_NAME } from '../src/instrumentation';
-import { FastifyInstrumentation } from '../src';
+import { AttributeNames, FastifyInstrumentation } from '../src';
 
 const URL = require('url').URL;
 
@@ -312,6 +312,64 @@ describe('fastify', () => {
           'fastify.type': 'request_handler',
           'plugin.name': 'subsystem',
           'http.route': '/test-error',
+        });
+      });
+    });
+
+    describe('spans context', () => {
+      describe('hook callback', () => {
+        it('span should end upon done invocation', async () => {
+          let hookDone: HookHandlerDoneFunction;
+          const hookExecutedPromise = new Promise<void>(resolve => {
+            app.addHook(
+              'onRequest',
+              (_req, _reply, done: HookHandlerDoneFunction) => {
+                hookDone = done;
+                resolve();
+              }
+            );
+          });
+          app.get('/test', (_req, reply: FastifyReply) => {
+            reply.send('request ended in handler');
+          });
+          await startServer();
+          httpRequest.get(`http://localhost:${PORT}/test`);
+          await hookExecutedPromise;
+
+          // done was not yet called from the hook, so it should not end the span
+          const preDoneSpans = getSpans().filter(
+            s => !s.attributes[AttributeNames.PLUGIN_NAME]
+          );
+          assert.strictEqual(preDoneSpans.length, 0);
+          hookDone!();
+          const postDoneSpans = getSpans().filter(
+            s => !s.attributes[AttributeNames.PLUGIN_NAME]
+          );
+          assert.strictEqual(postDoneSpans.length, 1);
+        });
+
+        it('span should end when calling reply.send from hook', async () => {
+          app.addHook(
+            'onRequest',
+            (
+              _req: FastifyRequest,
+              reply: FastifyReply,
+              _done: HookHandlerDoneFunction
+            ) => {
+              reply.send('request ended prematurely in hook');
+            }
+          );
+          app.get('/test', (_req: FastifyRequest, _reply: FastifyReply) => {
+            throw Error(
+              'handler should not be executed as request is ended in onRequest hook'
+            );
+          });
+          await startServer();
+          await httpRequest.get(`http://localhost:${PORT}/test`);
+          const spans = getSpans().filter(
+            s => !s.attributes[AttributeNames.PLUGIN_NAME]
+          );
+          assert.strictEqual(spans.length, 1);
         });
       });
     });
