@@ -120,11 +120,13 @@ export class FastifyInstrumentation extends InstrumentationBase {
         syncFunctionWithDone &&
         (args[args.length - 1] as HookHandlerDoneFunction);
       if (origDone) {
+        const origContext = context.active();
         args[args.length - 1] = function (
           ...doneArgs: Parameters<HookHandlerDoneFunction>
         ) {
           endSpan(reply);
-          origDone.apply(this, doneArgs);
+          // restore the context that was set prior to the hook
+          context.with(origContext, origDone, this, ...doneArgs);
         };
       }
 
