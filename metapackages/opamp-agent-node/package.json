@@ -20,14 +20,17 @@
   "repository": "open-telemetry/opentelemetry-js-contrib",
   "scripts": {
     "clean": "rimraf build/*",
-    "compile": "tsc -p .",
+    "compile": "npm run protos && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "precompile": "tsc --version && lerna run version:update --scope @opentelemetry/opamp-agent-node --include-dependencies",
     "prewatch": "npm run precompile",
     "prepare": "npm run compile",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
+    "protos": "npm run submodule && npm run protos:generate",
+    "protos:generate": "node scripts/generate-protos.js"
   },
   "bugs": {
     "url": "https://github.com/open-telemetry/opentelemetry-js-contrib/issues"
@@ -48,6 +51,6 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    
+    "protobufjs": "^7.2.3"
   }
 }
