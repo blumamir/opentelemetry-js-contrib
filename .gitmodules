@@ -1,0 +1,3 @@
+[submodule "metapackages/opamp-agent-node/protos"]
+	path = metapackages/opamp-agent-node/protos
+	url = https://github.com/open-telemetry/opamp-spec.git

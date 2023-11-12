@@ -15,7 +15,7 @@
     "clean": "lerna run clean",
     "postinstall": "npm run bootstrap",
     "prepare": "husky install",
-    "precompile": "tsc --version && npm run version:update",
+    "precompile": "tsc --version && npm run version:update && npm run submodule",
     "version:update": "lerna run version:update",
     "compile": "lerna run compile",
     "compile:examples": "lerna run compile:examples",
@@ -31,7 +31,8 @@
     "lint:fix": "lerna run lint:fix",
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix",
-    "lerna:scope": "lerna bootstrap --include-dependents --include-dependencies --scope"
+    "lerna:scope": "lerna bootstrap --include-dependents --include-dependencies --scope",
+    "submodule": "git submodule sync --recursive && git submodule update --init --recursive"
   },
   "keywords": [
     "opentelemetry",
