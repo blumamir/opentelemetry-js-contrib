@@ -1,4 +1,4 @@
-# OpenTelemetry mongodb Instrumentation for Node.js
+# OpenTelemetry MongoDB Instrumentation for Node.js
 
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
@@ -17,11 +17,11 @@ npm install --save @opentelemetry/instrumentation-mongodb
 
 ### Supported Versions
 
-- `>=3.3 <5`
+- `>=3.3 <7`
 
 ## Usage
 
-OpenTelemetry Mongodb Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
+OpenTelemetry MongoDB Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
 
 To load a specific instrumentation (**mongodb** in this case), specify it in the Node Tracer's configuration.
 
@@ -42,6 +42,8 @@ registerInstrumentations({
 });
 
 ```
+
+See [`examples/mongodb`](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/examples/mongodb) for a short example.
 
 ### Mongo instrumentation Options
 
